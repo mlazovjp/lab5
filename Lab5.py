@@ -1,11 +1,10 @@
+# Reverse Engineering
+# Lab 5, script 2
+# Jeremy Mlazovsky
+
 print "Hello Lab5\n"
 
 from idaapi import *
-
-ea = 0x401241
-
-def testStandAlone():
-	print("testStandAlone")
 
 class MyDbgHook(DBG_Hooks):
 
@@ -59,18 +58,6 @@ class MyDbgHook(DBG_Hooks):
 		else:
 			request_step_over()
 		return 0
-		
-	def dbg_patchByte(ea, new_val):
-
-		#print("BYTE @ 0x%x before patching is [0x%X]" % (ea, Byte(0x401241)))
-		print("Debug: BYTE @ 0x%x before patching is [0x%X]" % (ea, Byte(ea)))
-		result = PatchByte(ea, new_val)
-		#print("BYTE @ 0x%x after patching is [0x%X]\n" % (ea, Byte(0x401241)))
-		print("Debug: Result was %d") % result
-		print("Debug: BYTE @ 0x%x after patching is [0x%X]\n" % (ea, Byte(ea)))
-		
-	def testMe():
-		print("Test!")
 
 
 # Remove an existing debug hook
@@ -81,7 +68,8 @@ try:
 except:
 	pass
 
-#ea = 0x401241
+# memory address at which the BYTE opcode 74 (jz) needs to be patched to 75 (jnz)
+ea = 0x401241
 
 	
 # Install the debug hook
@@ -89,42 +77,13 @@ debughook = MyDbgHook()
 debughook.hook()
 debughook.steps = 0
 
-# Stop at the entry point
-ep = GetLongPrm(INF_START_IP)
-request_run_to(ep)
-
-# Step one instruction
-request_step_over()
-
-
-
 # Add a breakpoint at address 0x401241 (right at the instruction we want to modify)
 # Adding like this enables the breakpoint as well
+AddBpt(ea)
 
-#AddBpt(0x401241)
-#AddBpt(ea)
 
-#debughook.dbg_bpt(self, tid, ea)
+# Stop at the break point "ea"
+request_run_to(ea)
 
 # Start debugging
 run_requests()
-testStandAlone()
-
-
-
-AddBpt(ea)
-
-#while not is_debugger_on():
-#	print("Debugger is not on")
-	
-#print("Debugger is on!")
-
-#patchThisByte(ea, 0x74)
-#patchThisByte(ea, 0x75)
-
-#patchhisByte(ea, 0x75)
-
-print("End of script")
-
-# Reset to op code 74 (jz) when finished
-#patchhisByte(ea, 0x74)
