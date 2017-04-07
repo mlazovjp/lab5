@@ -39,27 +39,25 @@ class MyDbgHook(DBG_Hooks):
 
 	def dbg_bpt(self, tid, ea):
 		print "Break point at 0x%x pid=%d" % (ea, tid)
-		
-		# if at section where user input string is in ESI register ...
-		if ea == 0x401370:
-		
-			esi = GetRegValue("esi")
-			print("ea=[0x%x]") % ea
-			print("esi=%d 0x%x %s") % (esi, esi,esi)
-			
-			# try reading data at 0x0019FDD8 ?
 
-			esi_string = ""
-			for character_number in range(0, 19):
-				print("")
-				character = Byte(esi+character_number)
+		password_string = ""
+		# if at section where user input string is in ESI register ...
+		if ea == 0x0040122D:
+		
+			password = LocByName("password")
+			print("password: [0x%x] %s") % (password, password)
+			password_length = get_item_size(password)
+			print("password_length: %d") % password_length
+			
+			for character_number in range(0, password_length-1):
+				#print("")
+				character = Byte(password+character_number)
 				print("character_number=%d") % character_number
 				print("character 0x%x %d %s") % (character, character, character)
-				#print("char=%d %x %s") % (character, character, chr(character))
-				esi_string = esi_string + chr(character)
+				password_string = password_string + chr(character)
 
-			print("user entered the password:%s\n") % esi_string
-
+			print("user entered the password:%s\n") % password_string
+			
 		return 0
 
 	def dbg_trace(self, tid, ea):
@@ -104,7 +102,7 @@ debughook.steps = 0
 AddBpt(ea)
 
 # set breakpoint at location where was can get user-entered password
-AddBpt(0x401370)
+AddBpt(0x0040122D)
 
 # Stop at the break point "ea"
 request_run_to(ea)
