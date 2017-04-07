@@ -44,15 +44,21 @@ class MyDbgHook(DBG_Hooks):
 		if ea == 0x401370:
 		
 			esi = GetRegValue("esi")
-			print("")
+			print("ea=[0x%x]") % ea
+			print("esi=%d 0x%x %s") % (esi, esi,esi)
+			
+			# try reading data at 0x0019FDD8 ?
 
 			esi_string = ""
 			for character_number in range(0, 19):
+				print("")
 				character = Byte(esi+character_number)
-				#print("char=%s") % chr(character)
+				print("character_number=%d") % character_number
+				print("character 0x%x %d %s") % (character, character, character)
+				#print("char=%d %x %s") % (character, character, chr(character))
 				esi_string = esi_string + chr(character)
 
-			print("user entered the password:%s") % esi_string
+			print("user entered the password:%s\n") % esi_string
 
 		return 0
 
