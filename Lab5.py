@@ -5,6 +5,7 @@
 print "Hello Lab5\n"
 
 from idaapi import *
+from idc import *
 
 class MyDbgHook(DBG_Hooks):
 
@@ -38,6 +39,21 @@ class MyDbgHook(DBG_Hooks):
 
 	def dbg_bpt(self, tid, ea):
 		print "Break point at 0x%x pid=%d" % (ea, tid)
+		
+		# if at section where user input string is in ESI register ...
+		if ea == 0x401370:
+		
+			esi = GetRegValue("esi")
+			print("")
+
+			esi_string = ""
+			for character_number in range(0, 19):
+				character = Byte(esi+character_number)
+				#print("char=%s") % chr(character)
+				esi_string = esi_string + chr(character)
+
+			print("user entered the password:%s") % esi_string
+
 		return 0
 
 	def dbg_trace(self, tid, ea):
@@ -81,6 +97,8 @@ debughook.steps = 0
 # Adding like this enables the breakpoint as well
 AddBpt(ea)
 
+# set breakpoint at location where was can get user-entered password
+AddBpt(0x401370)
 
 # Stop at the break point "ea"
 request_run_to(ea)
